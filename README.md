@@ -2,7 +2,7 @@
 
 > Advanced customer experience analysis for Ethiopian mobile banking applications using NLP and data engineering
 
-[![Python](https://img.shields.io/badge/Python-3.8%2B-blue)](https://python.org)
+[![Python](https://img.shields.io/badge/Python-3.10%2B-blue)](https://python.org)
 [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-12%2B-blue)](https://postgresql.org)
 [![License](https://img.shields.io/badge/License-MIT-green)](LICENSE)
 [![Status](https://img.shields.io/badge/Status-Completed-success)]()
@@ -21,34 +21,34 @@ This project analyzes Google Play Store reviews for three major Ethiopian bankin
 - Provide actionable insights for product improvement
 - Enable competitive benchmarking across banking apps
 - Support strategic roadmap development for digital banking
-
 ## 📁 Project Structure
 
+```text
 fintech-reviews-analysis/
 │
-├── 📁 data/ # Data files
-│   ├── raw_reviews.csv # Raw scraped data
-│   ├── cleaned_reviews.csv # Preprocessed data
-│   ├── analyzed_reviews.csv # Sentiment analysis results
-│   └── final_analyzed_reviews.csv # Complete analysis
+├── data/ # Data files
+│   ├── raw_reviews.csv # Raw scraped data
+│   ├── cleaned_reviews.csv # Preprocessed data
+│   ├── analyzed_reviews.csv # Sentiment analysis results
+│   └── final_analyzed_reviews.csv # Complete analysis
 │
-├── 📁 scripts/ # Analysis scripts
-│   ├── scraper.py # Google Play Store data collection
-│   ├── preprocessor.py # Data cleaning and preprocessing
-│   ├── sentiment_analyzer.py # NLP sentiment analysis (DistilBERT)
-│   ├── thematic_analyzer.py # Thematic analysis and categorization
-│   ├── database_handler.py # PostgreSQL database operations
-│   └── visualizer.py # Data visualization generation
+├── scripts/ # Analysis scripts
+│   ├── scraper.py # Google Play Store data collection
+│   ├── preprocessor.py # Data cleaning and preprocessing
+│   ├── sentiment_analyzer.py # NLP sentiment analysis (DistilBERT)
+│   ├── thematic_analyzer.py # Thematic analysis and categorization
+│   ├── database_handler.py # PostgreSQL database operations
+│   └── visualizer.py # Data visualization generation
 │
-├── 📁 reports/ # Generated outputs
-│   ├── *.png # Analysis visualizations
-│   └── *.docx # Professional reports
+├── reports/ # Generated outputs
+│   ├── *.png # Analysis visualizations
+│   └── *.docx # Professional reports
 │
-├── 📁 database/ # Database schema and setup
-│   └── schema.sql # PostgreSQL database schema
+├── database/ # Database schema and setup
+│   └── schema.sql # PostgreSQL database schema
 │
-├── 📁 tests/ # Unit tests
-│   └── test_sentiment.py # Test cases for sentiment analysis
+├── tests/ # Unit tests
+│   └── test_sentiment.py # Test cases for sentiment analysis
 │
 ├── main.py # Main pipeline orchestrator
 ├── create_interim_report.py # Interim report generator
@@ -58,6 +58,7 @@ fintech-reviews-analysis/
 ├── LICENSE # MIT License
 └── README.md # This documentation
 
+```
 ## 🚀 Quick Start
 
 ### Prerequisites
@@ -67,68 +68,85 @@ fintech-reviews-analysis/
 
 ### Installation
  # **Clone the repository**
-
-git clone https://github.com/yourusername/fintech-reviews-analysis.git
+ ```
+git clone https://github.com/DE143/fintech-reviews-analysis.git
 cd fintech-reviews-analysis
-
-## 🚀 Create virtual environment
+```
+```
+Create virtual environment
 python -m venv venv
-
-# Windows:
+```
+```
+ Windows:
 venv\Scripts\activate
-
-# Mac/Linux:
+```
+```
+ Mac/Linux:
 source venv/bin/activate
-
-## 🚀 Install dependencies
+```
+```
+ Install dependencies
 pip install -r requirements.txt
 python -m spacy download en_core_web_sm
+```
+```
+ Setup PostgreSQL
 
-## 🚀 Setup PostgreSQL
-
-# Create database
+ Create database
 createdb bank_reviews
-
-# Set environment variable
+```
+```
+ Set environment variable
 export DB_PASSWORD=your_password
-# Windows: set DB_PASSWORD=your_password
-
-## 🚀 Run Complete Pipeline
+Windows: set DB_PASSWORD=your_password
+```
+Run Complete Pipeline
+```
 python main.py
+```
+ Run Individual Components
 
-## 🚀  Run Individual Components
-
-# Data collection
+ Data collection
+ ```
 python scripts/scraper.py
-
-# Preprocessing
+```
+ Preprocessing
+ ```
 python scripts/preprocessor.py
-
-# Sentiment analysis
+```
+ Sentiment analysis
+ ```
 python scripts/sentiment_analyzer.py
-
-# Thematic analysis
+```
+ Thematic analysis
+ ```
 python scripts/thematic_analyzer.py
-
-# Database integration
+```
+ Database integration
+ ```
 python scripts/database_handler.py
-
-# Visualization generation
+```
+ Visualization generation
+ ```
 python scripts/visualizer.py
-
-# Report generation
+```
+ Report generation
+ ```
 python create_interim_report.py
+```
+```
 python create_final_report.py
-
+```
 ## 🚀 Database Schema
-
+```
 -- Banks table
 CREATE TABLE banks (
     bank_id SERIAL PRIMARY KEY,
     bank_name VARCHAR(100) NOT NULL,
     app_name VARCHAR(100) NOT NULL
 );
-
+```
+```
 -- Reviews table
 CREATE TABLE reviews (
     review_id VARCHAR(100) PRIMARY KEY,
@@ -143,7 +161,7 @@ CREATE TABLE reviews (
     keywords TEXT,
     source VARCHAR(50)
 );
-
+```
 ## Key Technologies
 
 - **Web Scraping:**  
@@ -316,9 +334,9 @@ This project is licensed under the **MIT License** — see the `LICENSE` file fo
 
 ## 📞 Contact
 
-**Project Maintainer:** Your Name  
-**Email:** your.email@example.com  
-**GitHub:** [@yourusername](https://github.com/yourusername)  
+**Project Maintainer:** Derese Ewunet 
+**Email:** derese641735.ew@gmail.com.com  
+**GitHub:** [@DE143](https://github.com/DE143)  
 
 ---
 
@@ -341,6 +359,6 @@ This project is licensed under the **MIT License** — see the `LICENSE` file fo
 
 ⭐ **If you found this project useful, please consider giving it a star on GitHub!** ⭐
 
-<img src="https://api.star-history.com/svg?repos=yourusername/fintech-reviews-analysis&type=Timeline" width="600">
+<img src="https://api.star-history.com/svg?repos=DE143/fintech-reviews-analysis&type=Timeline" width="600">
 
 </div>
