@@ -27,28 +27,28 @@ This project analyzes Google Play Store reviews for three major Ethiopian bankin
 fintech-reviews-analysis/
 │
 ├── 📁 data/ # Data files
-│ ├── raw_reviews.csv # Raw scraped data
-│ ├── cleaned_reviews.csv # Preprocessed data
-│ ├── analyzed_reviews.csv # Sentiment analysis results
-│ └── final_analyzed_reviews.csv # Complete analysis
+│   ├── raw_reviews.csv # Raw scraped data
+│   ├── cleaned_reviews.csv # Preprocessed data
+│   ├── analyzed_reviews.csv # Sentiment analysis results
+│   └── final_analyzed_reviews.csv # Complete analysis
 │
 ├── 📁 scripts/ # Analysis scripts
-│ ├── scraper.py # Google Play Store data collection
-│ ├── preprocessor.py # Data cleaning and preprocessing
-│ ├── sentiment_analyzer.py # NLP sentiment analysis (DistilBERT)
-│ ├── thematic_analyzer.py # Thematic analysis and categorization
-│ ├── database_handler.py # PostgreSQL database operations
-│ └── visualizer.py # Data visualization generation
+│   ├── scraper.py # Google Play Store data collection
+│   ├── preprocessor.py # Data cleaning and preprocessing
+│   ├── sentiment_analyzer.py # NLP sentiment analysis (DistilBERT)
+│   ├── thematic_analyzer.py # Thematic analysis and categorization
+│   ├── database_handler.py # PostgreSQL database operations
+│   └── visualizer.py # Data visualization generation
 │
 ├── 📁 reports/ # Generated outputs
-│ ├── *.png # Analysis visualizations
-│ └── *.docx # Professional reports
+│   ├── *.png # Analysis visualizations
+│   └── *.docx # Professional reports
 │
 ├── 📁 database/ # Database schema and setup
-│ └── schema.sql # PostgreSQL database schema
+│   └── schema.sql # PostgreSQL database schema
 │
 ├── 📁 tests/ # Unit tests
-│ └── test_sentiment.py # Test cases for sentiment analysis
+│   └── test_sentiment.py # Test cases for sentiment analysis
 │
 ├── main.py # Main pipeline orchestrator
 ├── create_interim_report.py # Interim report generator
@@ -58,7 +58,6 @@ fintech-reviews-analysis/
 ├── LICENSE # MIT License
 └── README.md # This documentation
 
-
 ## 🚀 Quick Start
 
 ### Prerequisites
@@ -67,9 +66,8 @@ fintech-reviews-analysis/
 - Git
 
 ### Installation
+ # **Clone the repository**
 
-1. **Clone the repository**
-```bash
 git clone https://github.com/yourusername/fintech-reviews-analysis.git
 cd fintech-reviews-analysis
 
@@ -146,7 +144,7 @@ CREATE TABLE reviews (
     source VARCHAR(50)
 );
 
-## 🧰 Key Technologies
+## Key Technologies
 
 - **Web Scraping:**  
   `google-play-scraper` library for collecting Google Play Store reviews.
