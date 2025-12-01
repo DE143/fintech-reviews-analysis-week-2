@@ -21,7 +21,7 @@ def create_interim_report():
     subtitle.alignment = WD_ALIGN_PARAGRAPH.CENTER
     
     doc.add_paragraph()
-    company = doc.add_paragraph('Omega Consultancy')
+    company = doc.add_paragraph('Derese Ewunet')
     company.alignment = WD_ALIGN_PARAGRAPH.CENTER
     
     date = doc.add_paragraph(f'Date: {datetime.now().strftime("%B %d, %Y")}')
