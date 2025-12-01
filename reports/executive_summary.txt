@@ -1,0 +1,24 @@
+EXECUTIVE SUMMARY
+============================================================
+
+Analysis of 1,500 Google Play Store reviews reveals:
+
+Commercial Bank of Ethiopia:
+  • Rating: 2.70/5.0
+  • Positive: 19.8%
+  • Reviews: 500
+
+Bank of Abyssinia:
+  • Rating: 2.11/5.0
+  • Positive: 18.4%
+  • Reviews: 500
+
+Dashen Bank:
+  • Rating: 4.04/5.0
+  • Positive: 68.2%
+  • Reviews: 500
+
+KEY RECOMMENDATIONS:
+• Dashen Bank: Maintain leadership, expand features
+• CBE: Focus on performance optimization
+• BOA: Prioritize UX redesign and authentication

@@ -1,0 +1,27 @@
+DATA ANALYSIS SUMMARY
+============================================================
+
+OVERALL STATISTICS:
+Total Reviews: 1,500
+Average Rating: 2.95/5.0
+Positive Sentiment: 35.5%
+
+BANK-WISE PERFORMANCE:
+
+Commercial Bank of Ethiopia:
+  Rating: 2.70/5.0
+  Positive: 99 (19.8%)
+  Negative: 401 (80.2%)
+  Total: 500
+
+Bank of Abyssinia:
+  Rating: 2.11/5.0
+  Positive: 92 (18.4%)
+  Negative: 408 (81.6%)
+  Total: 500
+
+Dashen Bank:
+  Rating: 4.04/5.0
+  Positive: 341 (68.2%)
+  Negative: 159 (31.8%)
+  Total: 500
