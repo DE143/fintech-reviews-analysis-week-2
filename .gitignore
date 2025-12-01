@@ -1,6 +1,6 @@
 # Data files
-data/*.csv
-!data/raw_reviews.csv
+# data/*.csv
+# !data/raw_reviews.csv
 
 # Database
 *.db
