@@ -476,3 +476,4 @@ def display_analysis_summary(df: pd.DataFrame):
 
 if __name__ == "__main__":
     main()
+    
