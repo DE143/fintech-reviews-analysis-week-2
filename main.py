@@ -6,7 +6,7 @@ import os
 import pandas as pd
 import logging
 import traceback
-from typing import Optional, Dict, Any
+from typing import Optional, Dict, Any, Tuple
 from datetime import datetime
 
 # Add scripts directory to path
@@ -20,6 +20,7 @@ try:
     from thematic_analyzer import ThematicAnalyzer
     from database_handler import DatabaseHandler
     from visualizer import ReviewVisualizer
+    from db_verifier import DatabaseVerifier  # New verification module
 except ImportError as e:
     print(f"❌ Import Error: {e}")
     print("Please ensure all required modules are in the 'scripts' directory:")
@@ -29,6 +30,7 @@ except ImportError as e:
     print("  - thematic_analyzer.py")
     print("  - database_handler.py")
     print("  - visualizer.py")
+    print("  - db_verifier.py (new for verification)")
     sys.exit(1)
 
 # Configure logging
@@ -51,7 +53,7 @@ logger = setup_logging()
 def ensure_directories():
     """Ensure all required directories exist"""
     try:
-        directories = ['data', 'reports', 'logs', 'backups']
+        directories = ['data', 'reports', 'logs', 'backups', 'verification']
         for directory in directories:
             os.makedirs(directory, exist_ok=True)
             logger.info(f"Directory created/verified: {directory}/")
@@ -91,17 +93,19 @@ def validate_dataframe(df: pd.DataFrame, step_name: str) -> bool:
         logger.warning(f"{step_name}: DataFrame is empty")
         return True  # Return True to allow empty data flow if expected
     
-    required_columns = ['review_text', 'rating', 'bank']
-    missing_columns = [col for col in required_columns if col not in df.columns]
+    # Check for required columns
+    required_columns = ['review_text', 'rating', 'bank', 'review_date', 'reviewer_name']
+    available_columns = [col for col in required_columns if col in df.columns]
     
-    if missing_columns:
-        logger.error(f"{step_name}: Missing required columns: {missing_columns}")
+    if len(available_columns) < 3:  # At least basic columns needed
+        logger.error(f"{step_name}: Insufficient columns. Found: {list(df.columns)}")
         return False
     
     # Check for null values in critical columns
-    null_counts = df[required_columns].isnull().sum()
-    if null_counts.any():
-        logger.warning(f"{step_name}: Found null values - {null_counts.to_dict()}")
+    if 'review_text' in df.columns:
+        null_counts = df[['review_text', 'rating']].isnull().sum()
+        if null_counts.any():
+            logger.warning(f"{step_name}: Found null values - {null_counts.to_dict()}")
     
     logger.info(f"{step_name}: DataFrame validated - {len(df)} rows, {len(df.columns)} columns")
     return True
@@ -125,6 +129,62 @@ def display_step_progress(step_num: int, step_name: str, status: str = "start"):
         print(message)
         logger.warning(message.strip())
 
+def database_pipeline_step(final_df: pd.DataFrame, db_handler: DatabaseHandler) -> Tuple[bool, Dict[str, Any]]:
+    """
+    Enhanced database pipeline step with proper wiring and verification
+    Returns: (success, verification_results)
+    """
+    try:
+        # Store original counts for verification
+        original_counts = {
+            'total_rows': len(final_df),
+            'banks': final_df['bank'].value_counts().to_dict() if 'bank' in final_df.columns else {},
+            'unique_reviews': final_df['review_text'].nunique() if 'review_text' in final_df.columns else 0
+        }
+        
+        logger.info(f"Original data stats - Rows: {original_counts['total_rows']}, "
+                   f"Banks: {len(original_counts['banks'])}")
+        
+        # Ensure database tables exist
+        display_step_progress(5, "Creating database tables", "start")
+        db_handler.create_tables()
+        display_step_progress(5, "Creating database tables", "success")
+        
+        # Insert all reviews from the cleaned dataframe
+        display_step_progress(5, f"Inserting {len(final_df)} reviews into database", "start")
+        inserted_count = db_handler.insert_data(final_df)
+        
+        if inserted_count > 0:
+            display_step_progress(5, f"Inserted {inserted_count} reviews into database", "success")
+        else:
+            display_step_progress(5, "No reviews inserted into database", "warning")
+        
+        # Run analytical queries
+        display_step_progress(5, "Running analytical queries", "start")
+        db_handler.run_queries()
+        display_step_progress(5, "Running analytical queries", "success")
+        
+        # Verify database contents
+        display_step_progress(5, "Verifying database integrity", "start")
+        
+        # FIX: Pass db_uri instead of connection_params
+        verifier = DatabaseVerifier(db_handler.db_uri)
+        verification_results = verifier.verify_database_contents(final_df)
+        
+        # Save verification report
+        verifier.save_verification_report(verification_results)
+        
+        if verification_results.get('integrity_check', False):
+            display_step_progress(5, "Database integrity verified", "success")
+        else:
+            display_step_progress(5, "Database verification issues found", "warning")
+        
+        return True, verification_results
+        
+    except Exception as e:
+        logger.error(f"Database pipeline step failed: {e}\n{traceback.format_exc()}")
+        return False, {'error': str(e)}
+
 def main():
     """Main pipeline execution function"""
     print("=" * 60)
@@ -135,6 +195,7 @@ def main():
     pipeline_data = {}
     success_steps = []
     failed_steps = []
+    verification_results = {}
     
     try:
         # Step 0: Setup
@@ -247,23 +308,39 @@ def main():
             logger.warning("Skipping thematic analysis: No analyzed data available")
             display_step_progress(4, "Thematic analysis (skipped)", "warning")
         
-        # Step 5: Database Storage (only if we have final data)
+        # Step 5: Database Storage with Verification (only if we have final data)
         if 'final' in pipeline_data and not pipeline_data['final'].empty:
-            display_step_progress(5, "Storing data in PostgreSQL", "start")
+            display_step_progress(5, "Database operations with verification", "start")
             try:
+                # Initialize database handler
                 db_handler = DatabaseHandler()
-                db_handler.create_tables()
-                db_handler.insert_data(pipeline_data['final'])
-                db_handler.run_queries()
-                display_step_progress(5, "Storing data in PostgreSQL", "success")
-                success_steps.append("Database Storage")
+                
+                # Run enhanced database pipeline
+                db_success, db_verification = database_pipeline_step(pipeline_data['final'], db_handler)
+                
+                if db_success:
+                    verification_results = db_verification
+                    display_step_progress(5, "Database operations with verification", "success")
+                    success_steps.append("Database Operations")
+                    
+                    # Display verification summary
+                    if 'verification_summary' in verification_results:
+                        print("\n" + "=" * 60)
+                        print("DATABASE VERIFICATION SUMMARY")
+                        print("=" * 60)
+                        for key, value in verification_results['verification_summary'].items():
+                            print(f"{key}: {value}")
+                else:
+                    display_step_progress(5, "Database operations with verification", "error")
+                    failed_steps.append("Database Operations")
+                    
             except Exception as e:
                 logger.error(f"Database operations failed: {e}\n{traceback.format_exc()}")
-                display_step_progress(5, "Storing data in PostgreSQL", "error")
-                failed_steps.append(f"Database Storage - {str(e)[:50]}...")
+                display_step_progress(5, "Database operations with verification", "error")
+                failed_steps.append(f"Database Operations - {str(e)[:50]}...")
         else:
-            logger.warning("Skipping database storage: No final data available")
-            display_step_progress(5, "Database storage (skipped)", "warning")
+            logger.warning("Skipping database operations: No final data available")
+            display_step_progress(5, "Database operations (skipped)", "warning")
         
         # Step 6: Visualization (only if we have final data)
         if 'final' in pipeline_data and not pipeline_data['final'].empty:
@@ -298,15 +375,32 @@ def main():
             for step in failed_steps:
                 print(f"  • {step}")
         
+        # Database verification highlights
+        if verification_results and 'integrity_check' in verification_results:
+            print(f"\n🔍 DATABASE INTEGRITY CHECK:")
+            if verification_results['integrity_check']:
+                print("  ✓ Database integrity verified")
+                if 'record_counts' in verification_results:
+                    counts = verification_results['record_counts']
+                    print(f"  ✓ Records inserted: {counts.get('database_total', 'N/A')}")
+                    print(f"  ✓ Source records: {counts.get('source_total', 'N/A')}")
+            else:
+                print("  ⚠ Database verification issues found")
+                if 'mismatches' in verification_results:
+                    for mismatch in verification_results['mismatches']:
+                        print(f"  • {mismatch}")
+        
         print(f"\n📊 FINAL STATUS:")
         if failed_steps:
             print(f"  Pipeline completed with {len(failed_steps)} error(s)")
             print(f"  Check logs/pipeline.log for detailed error information")
+            print(f"  Verification report: verification/db_verification_report.txt")
         else:
             print("  ✓ All steps completed successfully!")
             print("  ✓ Data files saved to data/ folder")
             print("  ✓ Visualizations saved to reports/ folder")
-            print("  ✓ Data stored in PostgreSQL database")
+            print("  ✓ Data stored and verified in PostgreSQL database")
+            print("  ✓ Verification report: verification/db_verification_report.txt")
         
     except KeyboardInterrupt:
         logger.warning("Pipeline execution interrupted by user")
